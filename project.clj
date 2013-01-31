@@ -1,6 +1,6 @@
-(defproject clj-webdriver "0.6.0-beta2"
+(defproject marshallbrekka/clj-webdriver "0.6.0-beta2"
   :description "Clojure API for Selenium-WebDriver"
-  :url "https://github.com/semperos/clj-webdriver"
+  :url "https://github.com/marshallbrekka/clj-webdriver"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :min-lein-version "2.0.0"
