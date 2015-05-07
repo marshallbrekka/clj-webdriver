@@ -33,7 +33,7 @@
 (defn set-driver!
   "Set a default `Driver` for this thread, optionally sending it to a starting `url`.
 
-   Available browsers are `:firefox`, `:chrome`, `:ie`, `:opera`, and `:htmlunit`.
+   Available browsers are `:firefox`, `:chrome`, `:ie`, `:opera`, `:phantomjs` and `:htmlunit`.
 
    Examples:
    =========
@@ -230,7 +230,7 @@
   ([q] (elements *driver* q))
   ([driver q]
      (if (element-like? q)
-       (list q)
+       (lazy-seq (list q))
        (*finder-fn* driver q))))
 
 ;; ## Driver functions ##
@@ -315,7 +315,7 @@
    (forward)
 
    ;;
-   ;; Specify number of times to go back
+   ;; Specify number of times to go forward
    ;;
    (forward 2)"
   ([] (forward *driver* 1))
@@ -555,7 +555,7 @@
    ;;
    ;; Full example
    ;;
-   (add-cookie {:name \"foo\", :value \"bar\", 
+   (add-cookie {:name \"foo\", :value \"bar\",
                 :domain \"example.com\", :path \"a-path\",
                 :expiry (java.util.Date.), :secure? false}) "
   ([cookie-spec] (add-cookie *driver* cookie-spec))
@@ -679,7 +679,7 @@
   ([pred] (wait/wait-until *driver* (fn [_] pred)))
   ([pred timeout] (wait/wait-until *driver* (fn [_] pred) timeout))
   ([pred timeout interval] (wait/wait-until *driver* (fn [_] pred) timeout interval))
-  ([driver pred timeout interval] (wait/wait-until driver (fn [d] (pred d)) timeout interval)))
+  ([driver pred timeout interval] (wait/wait-until driver pred timeout interval)))
 
 (defn implicit-wait
   "Set the global `timeout` that the browser should wait when attempting to find elements on the page, before timing out with an exception.
@@ -762,7 +762,7 @@
    (find-table-cell \"table#my-table\" [1 1])"
   ([table-q coords] (find-table-cell *driver* table-q coords))
   ([driver table-q coords]
-     (core/find-table-cell driver (element table-q) coords)))
+     (core/find-table-cell driver (element driver table-q) coords)))
 
 (defn find-table-row
   "Within the table found with query `table-q`, return a seq of all cells at row number `row`. The top-most row is row `0` (zero-based index).
@@ -776,7 +776,7 @@
    (find-table-row \"table#my-table\" 1)"
   ([table-q row] (find-table-row *driver* table-q row))
   ([driver table-q row]
-     (core/find-table-row driver (element table-q) row)))
+     (core/find-table-row driver (element driver table-q) row)))
 
 ;; Need to explain difference between element and find-element fn's
 (defn find-elements
@@ -1261,7 +1261,7 @@
      (core/all-selected-options (element driver q))))
 
 (defn deselect-option
-  "Deselect the option element matching `attr-val` within the first select list found with query `q`. 
+  "Deselect the option element matching `attr-val` within the first select list found with query `q`.
 
    The `attr-val` can contain `:index`, `:value`, or `:text` keys to find the target option element. Index is the zero-based order of the option element in the list, value is the value of the HTML value attribute, and text is the visible text of the option element on the page.
 
@@ -1343,7 +1343,7 @@
   ([driver q] (core/multiple? (element driver q))))
 
 (defn select-option
-  "Select the option element matching `attr-val` within the first select list found with query `q`. 
+  "Select the option element matching `attr-val` within the first select list found with query `q`.
 
    The `attr-val` can contain `:index`, `:value`, or `:text` keys to find the target option element. Index is the zero-based order of the option element in the list, value is the value of the HTML value attribute, and text is the visible text of the option element on the page.
 
@@ -1405,12 +1405,12 @@
      (core/select-by-text (element driver q) text)))
 
 (defn select-by-value
-  "Deselect the option element with `value` within the first select list found with query `q`.
+  "Select the option element with `value` within the first select list found with query `q`.
 
    Examples:
    =========
 
-   (deselect-by-value \"#my-select-list\" \"foo\")"
+   (select-by-value \"#my-select-list\" \"foo\")"
   ([q value] (select-by-value *driver* q value))
   ([driver q value]
      (core/select-by-value (element driver q) value)))

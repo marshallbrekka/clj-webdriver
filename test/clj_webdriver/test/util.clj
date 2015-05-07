@@ -2,8 +2,23 @@
   (:use [clojure.test :only [deftest]]
         [clojure.template :only [apply-template]]
         [ring.adapter.jetty :only [run-jetty]]
+        [clj-webdriver.driver :only [init-driver]]
         [clj-webdriver.test.config])
-  (:require [clj-webdriver.test.example-app.core :as web-app]))
+  (:require [clj-webdriver.test.example-app.core :as web-app]
+            [clojure.tools.logging :as log])
+  (:import java.io.File))
+
+;; System checks
+(defn chromium-installed?
+  []
+  (.exists (File. "/usr/lib/chromium-browser/chromium-browser")))
+
+(defn chromium-preferred?
+  "If a Chromium installation can be detected and the `WEBDRIVER_USE_CHROMIUM` environment variable is defined, return true."
+  []
+  (log/info "Chromium installation detected. Using Chromium instead of Chrome.")
+  (and (chromium-installed?)
+       (get (System/getenv) "WEBDRIVER_USE_CHROMIUM")))
 
 ;; Fixtures
 (defn start-server [f]
@@ -34,12 +49,12 @@
   [item l]
   (cond
    (empty? l) '()
-   
+
    (not (list? (first l)))
    (cond
     (= (first l) item) (multirember item (next l))
     :else (cons (first l) (multirember item (next l))))
-   
+
    :else (cons (multirember item (first l)) (multirember item (next l)))))
 
 (defmacro deftest-template-param

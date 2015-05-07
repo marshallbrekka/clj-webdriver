@@ -13,13 +13,13 @@ This is a Clojure library for driving a web browser using Selenium-WebDriver as 
   <tbody>
     <tr>
       <td>Stable</td>
-      <td>Feb 15 2012</td>
-      <td><code>[clj-webdriver "0.5.1"]</code></td>
+      <td>January 20 2014</td>
+      <td><code>[clj-webdriver "0.6.1"]</code></td>
     </tr>
     <tr>
       <td>Pre-Release</td>
-      <td>November 6 2012</td>
-      <td><code>[clj-webdriver "0.6.0-beta2"]</code></td>
+      <td>(Build locally)</td>
+      <td><code>[clj-webdriver "0.7.0-SNAPSHOT"]</code></td>
     </tr>
   </tbody>
 </table>
@@ -33,7 +33,7 @@ This is a Clojure library for driving a web browser using Selenium-WebDriver as 
 **External Resources**
 
  * [Selenium-WebDriver API (Javadoc)](http://selenium.googlecode.com/svn/trunk/docs/api/java/index.html)
- * [Selenium-WebDriver Changelog](http://code.google.com/p/selenium/source/browse/trunk/java/CHANGELOG)
+ * [Selenium-WebDriver Changelog](https://code.google.com/p/selenium/source/browse/java/CHANGELOG)
  * [CSS Selector Syntax](http://www.w3.org/TR/css3-selectors/#selectors)
 
 **Please join the Google group if you use this library.** I regularly post announcements about upcoming releases, and although I ensure all tests are passing and try to maintain good test coverage before releases, user testing is invaluable. Thank you!
@@ -67,6 +67,8 @@ Forms can be filled out en masse using the `quick-fill-submit` function:
                    {"#password" submit})
 ```
 
+Please note that the high-level Taxi API is only available in the 0.6.0 release series.
+
 ## Documentation ##
 
 For API documentation on the high-level Taxi API (shown above), please [see its wiki page](https://github.com/semperos/clj-webdriver/wiki/Introduction%3A-Taxi).
@@ -77,7 +79,7 @@ For reference documentation, run `lein doc` at the root of this repo. For annota
 
 The `master` branch of clj-webdriver houses code intended for the next **minor-version release.** If you want to propose new features for the next release, you're welcome to fork, make a topic branch and issue a pull request against the `master` branch.
 
-If you want to fix a bug in the **current release**, please pull against the appropriate branch for the current minor version, **0.5.x**.
+If you want to fix a bug in the **current release**, please pull against the appropriate branch for the current minor version, **0.6.x**.
 
 ## Running Tests ##
 
@@ -113,6 +115,7 @@ Credits to [mikitebeka/webdriver-clj](https://github.com/mikitebeka/webdriver-cl
 
 Many thanks to those who have contributed so far (in nick-alphabetical order):
 
+ * [kapman](https://github.com/kapman)
  * [mangaohua](https://github.com/mangaohua)
  * [maxweber](https://github.com/maxweber) (Max Weber)
  * [RobLally](https://github.com/RobLally) (Rob Lally)

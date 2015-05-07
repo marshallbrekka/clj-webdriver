@@ -1,16 +1,26 @@
-(defproject marshallbrekka/clj-webdriver "0.6.0-beta2"
+(defproject marshallbrekka/clj-webdriver "0.6.2"
   :description "Clojure API for Selenium-WebDriver"
   :url "https://github.com/marshallbrekka/clj-webdriver"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :min-lein-version "2.0.0"
-  :dependencies [[org.clojure/clojure "1.4.0"]
+  :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/core.cache "0.5.0"]
                  [org.clojure/tools.logging "0.2.3"]
-                 [clj-http "0.3.0"]
+                 ;; Exclude these, giving preference to Selenium-WebDriver's
+                 ;; dependence on them.
+                 [clj-http "0.3.0" :exclusions [org.apache.httpcomponents/httpclient
+                                                org.apache.httpcomponents/httpcore
+                                                org.apache.httpcomponents/httpmime]]
                  [cheshire "2.1.0"]
                  [org.mortbay.jetty/jetty "6.1.25"]
-                 [org.seleniumhq.selenium/selenium-server "2.26.0"]]
+                 [org.seleniumhq.selenium/selenium-server "2.43.0"]
+                 [org.seleniumhq.selenium/selenium-java "2.43.0"]
+                 [org.seleniumhq.selenium/selenium-remote-driver "2.43.0"]
+                 [com.github.detro/phantomjsdriver "1.2.0"
+                  :exclusion [org.seleniumhq.selenium/selenium-java
+                              org.seleniumhq.selenium/selenium-server
+                              org.seleniumhq.selenium/selenium-remote-driver]]]
   :profiles {:dev
              {:dependencies
               [[criterium "0.2.0"]

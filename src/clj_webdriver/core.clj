@@ -30,11 +30,12 @@
            [org.openqa.selenium.firefox FirefoxDriver]
            [org.openqa.selenium.ie InternetExplorerDriver]
            [org.openqa.selenium.chrome ChromeDriver]
-           ;; [com.opera.core.systems OperaDriver]
+           [org.openqa.selenium.phantomjs PhantomJSDriver]
            [org.openqa.selenium.htmlunit HtmlUnitDriver]
-           ;; [org.openqa.selenium.security UserAndPassword]
            [org.openqa.selenium.support.ui Select]
            [org.openqa.selenium.interactions Actions CompositeAction]
+           [org.openqa.selenium Capabilities]
+           [org.openqa.selenium.remote DesiredCapabilities]
            [java.util Date]
            [java.io File]))
 
@@ -133,7 +134,7 @@
   (deselect-all [select-element] "Deselect all options for a given select list. Does not leverage WebDriver method because WebDriver's isMultiple method is faulty.")
   (deselect-by-index [select-element idx] "Deselect the option at index `idx` for the select list described by `by`. Indeces begin at 0")
   (deselect-by-text [select-element text] "Deselect all options with visible text `text` for the select list described by `by`")
-  (deselect-by-value [select-element value] "Deselect all options with value `value` for the select list described by `by`")  
+  (deselect-by-value [select-element value] "Deselect all options with value `value` for the select list described by `by`")
   (first-selected-option [select-element] "Retrieve the first selected option (or the only one for single-select lists) from the given select list")
   (multiple? [select-element] "Return true if the given select list allows for multiple selections")
   (select-option [select-element attr-val] "Select an option from a select list, either by `:value`, `:index` or `:text`")
@@ -174,6 +175,7 @@
   {:firefox FirefoxDriver
    :ie InternetExplorerDriver
    :chrome ChromeDriver
+   :phantomjs PhantomJSDriver
    ;; :opera OperaDriver
    :htmlunit HtmlUnitDriver})
 
@@ -189,16 +191,26 @@
 (defn new-driver
   "Start a new Driver instance. The `browser-spec` can include `:browser`, `:profile`, and `:cache-spec` keys.
 
-   The `:browser` can be one of `:firefox`, `:ie`, `:chrome` or `:htmlunit`.
+   The `:browser` can be one of `:firefox`, `:ie`, `:chrome`, `phantomjs` or `:htmlunit`.
    The `:profile` should be an instance of FirefoxProfile you wish to use.
    The `:cache-spec` can contain `:strategy`, `:args`, `:include` and/or `:exclude keys. See documentation on caching for more details."
   ([browser-spec]
      (let [{:keys [browser profile cache-spec] :or {browser :firefox
                                                     profile nil
                                                     cache-spec {}}} browser-spec]
+
        (init-driver {:webdriver (new-webdriver* {:browser browser
                                                  :profile profile})
                      :cache-spec cache-spec}))))
+
+;; Chrome binary, common location of Chromium on Linux
+(comment
+  (do
+    (import 'org.openqa.selenium.remote.DesiredCapabilities)
+    (let [cap (DesiredCapabilities/chrome)]
+      (.setCapability cap "chrome.binary" "/usr/lib/chromium-browser/chromium-browser")
+      (init-driver (ChromeDriver. cap))))
+)
 
 (defn start
   "Shortcut to instantiate a driver, navigate to a URL, and return the driver for further use"
@@ -298,7 +310,7 @@
 
    Unless you need to wait to execute your composite actions, you should prefer `->actions` to this macro."
   [driver & body]
-  `(let [acts# (doto (:actions ~driver) 
+  `(let [acts# (doto (:actions ~driver)
                  ~@body)]
      (.build acts#)))
 
