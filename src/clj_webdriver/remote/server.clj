@@ -26,13 +26,18 @@
   "Internal: wire up the `RemoteWebDriverExt` object correctly with a command executor and capabilities."
   ([remote-server browser-spec] (new-remote-webdriver* remote-server
                                                        browser-spec
-                                                       {}))
-  ([remote-server browser-spec capabilities]
+                                                       {}
+                                                       nil))
+  ([remote-server browser-spec capabilities extra-capabilities]
+     (clojure.tools.logging/info remote-server browser-spec capabilities)
      (let [http-cmd-exec (HttpCommandExecutor. (as-url (address remote-server)))
            {:keys [browser]} browser-spec
            desired-caps (if (seq capabilities)
                           (DesiredCapabilities. (util/java-keys capabilities))
                           (util/call-method DesiredCapabilities browser nil nil))
+           _ (when (seq extra-capabilities)
+               (doseq [[prop-key prop-val] extra-capabilities]
+                 (.setCapability desired-caps prop-key prop-val)))
            remote-webdriver (RemoteWebDriverExt. http-cmd-exec desired-caps)]
        [remote-webdriver, desired-caps])))
 
@@ -72,13 +77,14 @@
 
   (new-remote-driver
     [remote-server browser-spec]
-    (let [{:keys [browser profile capabilities cache-spec]
+    (let [{:keys [browser profile capabilities cache-spec raw-capabilities]
            :or {browser :firefox cache-spec {}}} browser-spec
            ;; WebDriver object, DesiredCapabilities object based on capabilities map passed in
            [webdriver desired-caps] (new-remote-webdriver* remote-server
                                                            {:browser browser
                                                             :profile profile}
-                                                           capabilities)
+                                                           capabilities
+                                                           raw-capabilities)
            ;; DesiredCapabilities as a Clojure map
            desired-capabilities (util/clojure-keys (into {} (.asMap desired-caps)))
            ;; actual capabilities (Java object) supported by the driver, despite your desired ones
