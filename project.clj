@@ -1,4 +1,4 @@
-(defproject marshallbrekka/clj-webdriver "0.6.4-SNAPSHOT1"
+(defproject marshallbrekka/clj-webdriver "0.6.4-SNAPSHOT2"
   :description "Clojure API for Selenium-WebDriver"
   :url "https://github.com/marshallbrekka/clj-webdriver"
   :license {:name "Eclipse Public License"

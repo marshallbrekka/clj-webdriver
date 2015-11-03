@@ -35,7 +35,7 @@
                             nil
                             nil
                             (Actions. driver-spec))]
-             (lg/info "created driver object:" d)
+             (lg/info "created driver object:")
              d))
        (let [{:keys [webdriver capabilities cache-spec]} driver-spec]
          (lg/info "creating driver object 2")
@@ -43,7 +43,7 @@
                           capabilities
                           (assoc cache-spec :cache (init-cache cache-spec))
                           (Actions. webdriver))]
-           (lg/info "created driver object 2:" d)
+           (lg/info "created driver object 2:")
            d))))))
 
 (defn driver?

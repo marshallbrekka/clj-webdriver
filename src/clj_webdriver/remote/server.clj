@@ -41,7 +41,7 @@
                (.setCapability desired-caps prop-key prop-val)))
          _ (lg/info "creating remote driver:" http-cmd-exec)
          remote-webdriver (RemoteWebDriverExt. http-cmd-exec desired-caps)]
-     (lg/info "created remote driver:" remote-webdriver)
+     (lg/info "created remote driver:")
      [remote-webdriver, desired-caps])))
 
 (defrecord RemoteServer [connection-params webdriver-server]
@@ -90,7 +90,7 @@
                                                             :profile profile}
                                                            capabilities
                                                            raw-capabilities)
-           _ (lg/info "created new remote webdriver" webdriver)
+           _ (lg/info "created new remote webdriver")
            ;; DesiredCapabilities as a Clojure map
            desired-capabilities (util/clojure-keys (into {} (.asMap desired-caps)))
            ;; actual capabilities (Java object) supported by the driver, despite your desired ones
