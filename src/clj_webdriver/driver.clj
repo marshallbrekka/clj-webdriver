@@ -1,5 +1,6 @@
 (ns clj-webdriver.driver
-  (:require [clojure.core.cache :as cache])
+  (:require [clojure.core.cache :as cache]
+            [clojure.tools.logging :as lg])
   (:import org.openqa.selenium.interactions.Actions))
 
 (defrecord Driver [webdriver capabilities cache-spec actions])
@@ -26,18 +27,24 @@
    cache-spec - map with keys :strategy, :args, :include and :exclude, used to setup caching rules"
   ([] (init-driver {}))
   ([driver-spec]
-     (let [wd-class (Class/forName "org.openqa.selenium.WebDriver")
-           uppers (supers (.getClass driver-spec))]
-       (if (some #{wd-class} uppers)
-         (Driver. driver-spec
-                  nil
-                  nil
-                  (Actions. driver-spec))
-         (let [{:keys [webdriver capabilities cache-spec]} driver-spec]
-           (Driver. webdriver
-                    capabilities
-                    (assoc cache-spec :cache (init-cache cache-spec))
-                    (Actions. webdriver)))))))
+   (let [wd-class (Class/forName "org.openqa.selenium.WebDriver")
+         uppers (supers (.getClass driver-spec))]
+     (if (some #{wd-class} uppers)
+       (do (lg/info "creating driver object")
+           (let [d (Driver. driver-spec
+                            nil
+                            nil
+                            (Actions. driver-spec))]
+             (lg/info "created driver object:" d)
+             d))
+       (let [{:keys [webdriver capabilities cache-spec]} driver-spec]
+         (lg/info "creating driver object 2")
+         (let [d (Driver. webdriver
+                          capabilities
+                          (assoc cache-spec :cache (init-cache cache-spec))
+                          (Actions. webdriver))]
+           (lg/info "created driver object 2:" d)
+           d))))))
 
 (defn driver?
   "Function to check class of a Driver, to prevent needing to import it"

@@ -1,7 +1,8 @@
 (ns clj-webdriver.remote.server
   (:use [clojure.java.io :only [as-url]]
         [clj-webdriver.driver :only [init-driver]]
-        [clj-webdriver.core :only [get-url]])
+        [clj-webdriver.core :only [get-url]]
+        [clojure.tools.logging :as lg])
   (:require [clj-webdriver.util :as util])
   (:import clj_webdriver.ext.remote.RemoteWebDriverExt
            [org.mortbay.jetty Connector Server]
@@ -29,17 +30,19 @@
                                                        {}
                                                        nil))
   ([remote-server browser-spec capabilities extra-capabilities]
-     (clojure.tools.logging/info remote-server browser-spec capabilities)
-     (let [http-cmd-exec (HttpCommandExecutor. (as-url (address remote-server)))
-           {:keys [browser]} browser-spec
-           desired-caps (if (seq capabilities)
-                          (DesiredCapabilities. (util/java-keys capabilities))
-                          (util/call-method DesiredCapabilities browser nil nil))
-           _ (when (seq extra-capabilities)
-               (doseq [[prop-key prop-val] extra-capabilities]
-                 (.setCapability desired-caps prop-key prop-val)))
-           remote-webdriver (RemoteWebDriverExt. http-cmd-exec desired-caps)]
-       [remote-webdriver, desired-caps])))
+   (lg/info remote-server browser-spec capabilities)
+   (let [http-cmd-exec (HttpCommandExecutor. (as-url (address remote-server)))
+         {:keys [browser]} browser-spec
+         desired-caps (if (seq capabilities)
+                        (DesiredCapabilities. (util/java-keys capabilities))
+                        (util/call-method DesiredCapabilities browser nil nil))
+         _ (when (seq extra-capabilities)
+             (doseq [[prop-key prop-val] extra-capabilities]
+               (.setCapability desired-caps prop-key prop-val)))
+         _ (lg/info "creating remote driver:" http-cmd-exec)
+         remote-webdriver (RemoteWebDriverExt. http-cmd-exec desired-caps)]
+     (lg/info "created remote driver:" remote-webdriver)
+     [remote-webdriver, desired-caps])))
 
 (defrecord RemoteServer [connection-params webdriver-server]
   IRemoteServer
@@ -79,12 +82,15 @@
     [remote-server browser-spec]
     (let [{:keys [browser profile capabilities cache-spec raw-capabilities]
            :or {browser :firefox cache-spec {}}} browser-spec
-           ;; WebDriver object, DesiredCapabilities object based on capabilities map passed in
+           ;; WebDriver object, DesiredCapabilities object based on capabilities
+           ;; map passed in
+           _ (lg/info "creating new remote webdriver")
            [webdriver desired-caps] (new-remote-webdriver* remote-server
                                                            {:browser browser
                                                             :profile profile}
                                                            capabilities
                                                            raw-capabilities)
+           _ (lg/info "created new remote webdriver" webdriver)
            ;; DesiredCapabilities as a Clojure map
            desired-capabilities (util/clojure-keys (into {} (.asMap desired-caps)))
            ;; actual capabilities (Java object) supported by the driver, despite your desired ones
